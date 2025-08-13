@@ -1,94 +1,138 @@
-# Diamo vita al nostro artificio come il sapiente alchimista che raccoglie gli ingredienti per la Grande Opera
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Cubo di Rubik 3D - Applicazione Principale
+Implementazione completa da zero con rotazione faccia superiore
+"""
+
 import tkinter as tk
 from tkinter import ttk
-from ttkthemes import ThemedStyle
-from rubiks_cube_model import RubiksCube
 from rubiks_cube_3d import RubiksCube3D
 
-# La classe principale, come la corte di un nobile signore che governa il reame dell'applicazione
-class RubiksCubeGUI:
-    # Come l'architetto che pone la prima pietra di una cattedrale
+class RubiksCubeApp:
     def __init__(self, root):
-        # La radice, come il tronco da cui si diramano tutti i rami dell'albero
         self.root = root
-        # Le dimensioni della finestra, come le proporzioni del tempio di Salomone
-        self.root.geometry("600x250")
-        # Il titolo, come l'iscrizione sul frontone della porta infernale scardinata descritta dal sommo poeta
-        self.root.title("3D Rubik's Cube Solver")
-        # Il colore di sfondo, come il cielo sereno che accoglie l'opera
-        self.root.configure(bg='#f0f0f0')
-        # Prepariamo l'aspetto, come il sarto che cuce le vesti per una cerimonia e che strizza l'occhio per meglio vedere la cruna dell'ago o come le Parche, o Moire, che personificano il destino, gestendo il filo della vita di ciascuno di noi
-        self.setup_theme()
-        # Creiamo l'interfaccia, come il mastro vetraio che compone una vetrata
+        self.root.title("Cubo di Rubik 3D")
+        self.root.geometry("400x300")
+        self.root.resizable(False, False)
+        
+        # Inizializza il cubo 3D
+        self.cube_3d = RubiksCube3D()
+        
+        # Stato dell'applicazione
+        self.is_animating = False
+        
+        # Crea l'interfaccia utente
         self.create_interface()
-        # Il cubo tridimensionale, come l'anima che dà vita al corpo
-        self.cube_3d = RubiksCube3D(root)
-
-    # Come l'artista Francesco Guardi che sceglie i colori per il suo affresco
-    def setup_theme(self):
-        # Tentiamo di applicare uno stile elegante, come chi cerca stoffe pregiate
-        try:
-            # Lo stile, come la livrea che distingue i nobili dai plebei
-            self.style = ThemedStyle(self.root)
-            # Impostiamo il tema, come il tono di una composizione musicale
-            self.style.set_theme("clam")
-        # Se fallisce, ripieghiamo su una soluzione più semplice, come il viandante che trova riparo in una capanna
-        except Exception:
-            self.style = ttk.Style(self.root)
-        # Configuriamo i bottoni, come il sarto che adorna gli abiti con ricami e bordure
-        self.style.configure('Custom.TButton', padding=(10, 5), font=('Segoe UI', 10))
-        # Configuriamo le etichette, come lo scriba che sceglie la pergamena e l'inchiostro
-        self.style.configure('Custom.TLabel', background='#f0f0f0', foreground='black', font=('Segoe UI', 10))
-
-    # Come il mastro costruttore che erige le mura e dispone le stanze del palazzo
+        
+        # Avvia il loop di aggiornamento
+        self.update_loop()
+    
     def create_interface(self):
-        # Il telaio principale, come le fondamenta su cui poggia l'intero edificio
-        main_frame = ttk.Frame(self.root)
-        main_frame.pack(expand=True, fill='both', padx=10, pady=10)
-        # Il telaio dei controlli, come la sala del trono dove si prendono le decisioni
-        controls_frame = ttk.Frame(main_frame)
-        controls_frame.pack(expand=True, fill='both', pady=5)
-        # Il bottone di reset, come la fontana che purifica e rinnova
-        self.reset_button = ttk.Button(controls_frame, text="Reset", style='Custom.TButton', command=self.reset_cube)
-        self.reset_button.pack(side='left', padx=5)
-        # Il bottone di chiusura, come il portale che segna il confine tra il dentro e il fuori
-        self.close_button = ttk.Button(controls_frame, text="Chiudi", style='Custom.TButton', command=self.close_program)
-        self.close_button.pack(side='left', padx=5)
-
-    # Come il tramonto che pone fine al giorno
-    def close_program(self):
-        # Distruggiamo la finestra, come il tempo che tutto consuma, ovvero come Crono che divora i suoi figli
-        self.root.destroy()
-
-    # Come il diluvio che purifica il mondo per ricominciare da capo, dopo la comparsa di un arcobaleno, simbolo del patto di pacificazione stabilito tra Dio e i credenti
+        """Crea l'interfaccia utente"""
+        # Frame principale
+        main_frame = ttk.Frame(self.root, padding="20")
+        main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        
+        # Titolo
+        title_label = ttk.Label(main_frame, text="Cubo di Rubik 3D", 
+                               font=('Arial', 16, 'bold'))
+        title_label.grid(row=0, column=0, columnspan=2, pady=(0, 20))
+        
+        # Sezione rotazioni
+        rotation_frame = ttk.LabelFrame(main_frame, text="Rotazione Faccia Superiore", padding="10")
+        rotation_frame.grid(row=1, column=0, columnspan=2, pady=(0, 20), sticky=(tk.W, tk.E))
+        
+        # Pulsanti rotazione
+        self.btn_clockwise = ttk.Button(rotation_frame, text="Ruota Orario", 
+                                       command=self.rotate_clockwise)
+        self.btn_clockwise.grid(row=0, column=0, padx=(0, 10))
+        
+        self.btn_counter_clockwise = ttk.Button(rotation_frame, text="Ruota Antiorario", 
+                                               command=self.rotate_counter_clockwise)
+        self.btn_counter_clockwise.grid(row=0, column=1)
+        
+        # Sezione controlli
+        control_frame = ttk.LabelFrame(main_frame, text="Controlli", padding="10")
+        control_frame.grid(row=2, column=0, columnspan=2, pady=(0, 20), sticky=(tk.W, tk.E))
+        
+        # Pulsante reset
+        self.btn_reset = ttk.Button(control_frame, text="Reset Cubo", 
+                                   command=self.reset_cube)
+        self.btn_reset.grid(row=0, column=0, padx=(0, 10))
+        
+        # Pulsante chiudi
+        self.btn_close = ttk.Button(control_frame, text="Chiudi", 
+                                   command=self.close_app)
+        self.btn_close.grid(row=0, column=1)
+        
+        # Label di stato
+        self.status_label = ttk.Label(main_frame, text="Pronto", 
+                                     foreground="green", font=('Arial', 10))
+        self.status_label.grid(row=3, column=0, columnspan=2, pady=(10, 0))
+    
+    def rotate_clockwise(self):
+        """Ruota la faccia superiore in senso orario"""
+        if self.is_animating:
+            return
+        
+        self.set_animating(True)
+        self.status_label.config(text="Rotazione oraria in corso...", foreground="orange")
+        self.cube_3d.rotate_face('up', 'clockwise', self.on_rotation_complete)
+    
+    def rotate_counter_clockwise(self):
+        """Ruota la faccia superiore in senso antiorario"""
+        if self.is_animating:
+            return
+        
+        self.set_animating(True)
+        self.status_label.config(text="Rotazione antioraria in corso...", foreground="orange")
+        self.cube_3d.rotate_face('up', 'counter-clockwise', self.on_rotation_complete)
+    
     def reset_cube(self):
-        # Disabilitiamo i pulsanti di comando, come il saggio che impone il silenzio prima di un rito
-        self.disable_all_buttons()
-        # Resettiamo il cubo, come il ritorno all'età dell'oro
-        self.cube_3d.reset_cube()
-        # Dopo un breve tempo, come la paziente attesa del contadino che, appoggiato alla sua zappa, ammira il campo costellato di lucciole all'imbrunire
-        self.root.after(50, self.enable_buttons)
+        """Resetta il cubo allo stato iniziale"""
+        if self.is_animating:
+            return
+        
+        self.cube_3d.reset()
+        self.status_label.config(text="Cubo resettato", foreground="blue")
+        self.root.after(2000, lambda: self.status_label.config(text="Pronto", foreground="green"))
+    
+    def close_app(self):
+        """Chiude l'applicazione"""
+        self.root.quit()
+        self.root.destroy()
+    
+    def on_rotation_complete(self):
+        """Callback chiamato al completamento di una rotazione"""
+        self.set_animating(False)
+        self.status_label.config(text="Rotazione completata", foreground="blue")
+        self.root.after(2000, lambda: self.status_label.config(text="Pronto", foreground="green"))
+    
+    def set_animating(self, animating):
+        """Imposta lo stato di animazione e abilita/disabilita i pulsanti"""
+        self.is_animating = animating
+        state = 'disabled' if animating else 'normal'
+        
+        self.btn_clockwise.config(state=state)
+        self.btn_counter_clockwise.config(state=state)
+        self.btn_reset.config(state=state)
+    
+    def update_loop(self):
+        """Loop di aggiornamento dell'applicazione"""
+        # Aggiorna il cubo 3D
+        if hasattr(self.cube_3d, 'update'):
+            self.cube_3d.update()
+        
+        # Programma il prossimo aggiornamento
+        self.root.after(16, self.update_loop)  # ~60 FPS
 
-    # Come il signore che vieta l'accesso al castello durante un assedio
-    def disable_all_buttons(self):
-        # Disabilitiamo il pulsante di comando di reset, come una porta sbarrata
-        self.reset_button.config(state=tk.DISABLED)
-        # Disabilitiamo il pulsante di comando di chiusura, come un ponte levatoio sollevato
-        self.close_button.config(state=tk.DISABLED)
-
-    # Come il signore che riapre le porte del castello dopo che il pericolo è passato
-    def enable_buttons(self):
-        # Riabilitiamo il pulsante di comando di reset, come una porta che si schiude, come gli occhi pesanti di morte di Piramo che si schiusero quando riapparve Tisbe al suo cospetto
-        self.reset_button.config(state=tk.NORMAL)
-        # Riabilitiamo il pulsante di comando di chiusura, come un ponte levatoio che si abbassa
-        self.close_button.config(state=tk.NORMAL)
-
-# Come il rito che dà inizio alla cerimonia
-if __name__ == "__main__":
-    # Creiamo la radice, come il seme da cui germoglierà l'albero
+def main():
+    """Funzione principale"""
     root = tk.Tk()
-    # Creiamo l'applicazione, come l'anima che dà vita al corpo dopo essere stata soffiata direttamente da Dio
-    app = RubiksCubeGUI(root)
-    # Avviamo il ciclo principale, come il tempo che scorre eternamente
+    app = RubiksCubeApp(root)
     root.mainloop()
+
+if __name__ == "__main__":
+    main()
 

@@ -1,153 +1,98 @@
-# Modello del cubo di Rubik
-# Come l'antico filosofo che concepisce l'essenza delle cose prima della loro manifestazione,
-# così qui definiamo la struttura fondamentale del nostro cubo, invisibile all'occhio ma presente all'intelletto.
-# Quale Aristotele che distingueva la forma dalla materia, noi qui descriviamo la forma pura del cubo,
-# che poi si vestirà di colori e movimenti nel mondo sensibile.
-from vpython import vector
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Modello Logico del Cubo di Rubik
+Implementazione completa da zero
+"""
 
-# I colori primigeni, come le quattro qualità elementari della fisica antica
-SOLVED_COLORS = {
-    'up': "white",     # Bianco come la purezza del cielo empireo
-    'down': "yellow",  # Giallo come l'oro degli alchimisti
-    'front': "blue",   # Azzurro come il manto della Vergine
-    'back': "green",   # Verde come i prati di primavera
-    'right': "red",    # Rosso come il fuoco trasformatore
-    'left': "orange"   # Arancio come il sole al tramonto
-}
-
-# La traduzione dei colori in numeri, come il sapiente che riduce le qualità sensibili a proporzioni matematiche
-VPYTHON_COLORS = {
-    "white": vector(1, 1, 1),      # Bianco, somma di tutti i colori, come la luce divina
-    "yellow": vector(1, 0.9, 0),   # Giallo, colore dell'intelletto e della saggezza
-    "blue": vector(0, 0.4, 1),     # Azzurro, colore del cielo e dell'infinito
-    "green": vector(0, 0.8, 0.2),  # Verde, colore della natura e della vita
-    "red": vector(1, 0.1, 0),      # Rosso, colore della passione e del sangue
-    "orange": vector(1, 0.4, 0)    # Arancio, colore del calore e dell'energia
-}
-
-ADJACENT_MOVES = {
-    'front': {
-        'adjacent': [
-            ('up',    [6, 7, 8]),
-            ('right', [0, 3, 6]),
-            ('down',  [2, 1, 0]),
-            ('left',  [8, 5, 2])
-        ]
-    },
-    'back': {
-        'adjacent': [
-            ('up',    [2, 1, 0]),
-            ('left',  [0, 3, 6]),
-            ('down',  [6, 7, 8]),
-            ('right', [8, 5, 2])
-        ]
-    },
-    'up': {
-        'adjacent': [
-            ('back',  [0, 1, 2]),
-            ('right', [0, 1, 2]),
-            ('front', [0, 1, 2]),
-            ('left',  [0, 1, 2])
-        ]
-    },
-    'down': {
-        'adjacent': [
-            ('front', [6, 7, 8]),
-            ('right', [6, 7, 8]),
-            ('back',  [6, 7, 8]),
-            ('left',  [6, 7, 8])
-        ]
-    },
-    'right': {
-        'adjacent': [
-            ('up',    [2, 5, 8]),
-            ('back',  [0, 3, 6]),
-            ('down',  [2, 5, 8]),
-            ('front', [2, 5, 8])
-        ]
-    },
-    'left': {
-        'adjacent': [
-            ('up',    [0, 3, 6]),
-            ('front', [0, 3, 6]),
-            ('down',  [0, 3, 6]),
-            ('back',  [8, 5, 2])
-        ]
-    }
-}
-
-# La classe che incarna l'essenza del cubo, come l'idea platonica che precede l'oggetto sensibile
-class RubiksCube:
-    # Come Dio che crea il mondo dal nulla, così noi qui creiamo il cubo nella sua forma iniziale
+class RubiksCubeModel:
     def __init__(self):
-        # La dimensione del cubo, come il numero perfetto della Trinità
-        self.size = 3
-        # Lo stato iniziale, come l'Eden in quelle sei ore prima del peccato commesso dalla guancia di Eva e proiettato su Adamo inconsapevole
-        self.state = self.create_solved_state()
-        # La storia dei movimenti, come le cronache che registrano gli eventi del mondo
-        self.move_history = []
+        """Inizializza il cubo nello stato risolto"""
+        self.reset()
     
-    # Come il Creatore che dispone ogni cosa nel suo giusto ordine
-    def create_solved_state(self):
-        # Creiamo un contenitore vuoto, come il caos primordiale
-        state = {}
-        # Per ogni faccia e colore, come per ogni regione del mondo
-        for face, col in SOLVED_COLORS.items():
-            # Assegniamo nove volte lo stesso colore, come le nove sfere celesti e come il numero di Beatrice
-            state[face] = [col] * 9
-        # Restituiamo lo stato ordinato, come il cosmo dopo la creazione
-        return state
-
-    # Come il Motore Immobile che causa il movimento delle sfere celesti
-    def rotate_face(self, face, direction):
-        # Registriamo il movimento nella storia, come gli annali che conservano memoria delle gesta
-        self.move_history.append((face, direction))
-        # Preserviamo lo stato precedente, come il saggio che ricorda il passato
-        old = self.state[face].copy()
-        # Se la rotazione è in senso orario, come il moto naturale dei cieli
-        if direction == 'clockwise':
-            # Riordiniamo gli elementi secondo le leggi del moto circolare
-            # Come le stelle che seguono il loro corso prestabilito
-            self.state[face][0] = old[6]
-            self.state[face][1] = old[3]
-            self.state[face][2] = old[0]
-            self.state[face][3] = old[7]
-            self.state[face][4] = old[4]  # Il centro rimane immobile, come la Terra nell'universo tolemaico
-            self.state[face][5] = old[1]
-            self.state[face][6] = old[8]
-            self.state[face][7] = old[5]
-            self.state[face][8] = old[2]
-        # Altrimenti, se la rotazione è in senso antiorario, come un moto retrogrado dei pianeti
-        else:
-            # Riordiniamo gli elementi in senso opposto, come un fiume che risale verso la sorgente
-            self.state[face][0] = old[2]
-            self.state[face][1] = old[5]
-            self.state[face][2] = old[8]
-            self.state[face][3] = old[1]
-            self.state[face][4] = old[4]  # Il centro rimane immobile, come il punto fisso del compasso
-            self.state[face][5] = old[7]
-            self.state[face][6] = old[0]
-            self.state[face][7] = old[3]
-            self.state[face][8] = old[6]
+    def reset(self):
+        """Resetta il cubo allo stato risolto con colori diversi per ogni faccia"""
+        # Ogni faccia è una matrice 3x3 con un colore uniforme
+        # W=Bianco, Y=Giallo, R=Rosso, O=Arancione, B=Blu, G=Verde
+        self.faces = {
+            'up': [['W', 'W', 'W'], ['W', 'W', 'W'], ['W', 'W', 'W']],      # Superiore - Bianco
+            'down': [['Y', 'Y', 'Y'], ['Y', 'Y', 'Y'], ['Y', 'Y', 'Y']],    # Inferiore - Giallo
+            'front': [['R', 'R', 'R'], ['R', 'R', 'R'], ['R', 'R', 'R']],   # Frontale - Rosso
+            'back': [['O', 'O', 'O'], ['O', 'O', 'O'], ['O', 'O', 'O']],    # Posteriore - Arancione
+            'right': [['B', 'B', 'B'], ['B', 'B', 'B'], ['B', 'B', 'B']],   # Destra - Blu
+            'left': [['G', 'G', 'G'], ['G', 'G', 'G'], ['G', 'G', 'G']]     # Sinistra - Verde
+        }
+    
+    def get_face(self, face_name):
+        """Restituisce una copia della faccia specificata"""
+        if face_name in self.faces:
+            return [row[:] for row in self.faces[face_name]]  # Copia profonda
+        return None
+    
+    def get_all_faces(self):
+        """Restituisce una copia di tutte le facce"""
+        return {name: self.get_face(name) for name in self.faces.keys()}
+    
+    def rotate_face_clockwise(self, face_matrix):
+        """Ruota una matrice 3x3 di 90° in senso orario"""
+        return [[face_matrix[2-j][i] for j in range(3)] for i in range(3)]
+    
+    def rotate_face_counter_clockwise(self, face_matrix):
+        """Ruota una matrice 3x3 di 90° in senso antiorario"""
+        return [[face_matrix[j][2-i] for j in range(3)] for i in range(3)]
+    
+    def rotate_up_clockwise(self):
+        """Ruota la faccia superiore in senso orario"""
+        # 1. Ruota la faccia superiore stessa
+        self.faces['up'] = self.rotate_face_clockwise(self.faces['up'])
         
-        mapping = ADJACENT_MOVES[face]['adjacent']
-        if direction == 'clockwise':
-            temp = [self.state[mapping[0][0]][i] for i in mapping[0][1]]
-            for j in range(3):
-                self.state[mapping[0][0]][mapping[0][1][j]] = self.state[mapping[3][0]][mapping[3][1][j]]
-            for j in range(3):
-                self.state[mapping[3][0]][mapping[3][1][j]] = self.state[mapping[2][0]][mapping[2][1][j]]
-            for j in range(3):
-                self.state[mapping[2][0]][mapping[2][1][j]] = self.state[mapping[1][0]][mapping[1][1][j]]
-            for j in range(3):
-                self.state[mapping[1][0]][mapping[1][1][j]] = temp[j]
-        else:
-            temp = [self.state[mapping[0][0]][i] for i in mapping[0][1]]
-            for j in range(3):
-                self.state[mapping[0][0]][mapping[0][1][j]] = self.state[mapping[1][0]][mapping[1][1][j]]
-            for j in range(3):
-                self.state[mapping[1][0]][mapping[1][1][j]] = self.state[mapping[2][0]][mapping[2][1][j]]
-            for j in range(3):
-                self.state[mapping[2][0]][mapping[2][1][j]] = self.state[mapping[3][0]][mapping[3][1][j]]
-            for j in range(3):
-                self.state[mapping[3][0]][mapping[3][1][j]] = temp[j]
+        # 2. Ruota le righe superiori delle facce adiacenti
+        # Salva la riga superiore della faccia frontale
+        temp_row = self.faces['front'][0][:]
+        
+        # Sposta le righe: front <- right <- back <- left <- front
+        self.faces['front'][0] = self.faces['right'][0][:]
+        self.faces['right'][0] = self.faces['back'][0][:]
+        self.faces['back'][0] = self.faces['left'][0][:]
+        self.faces['left'][0] = temp_row
+    
+    def rotate_up_counter_clockwise(self):
+        """Ruota la faccia superiore in senso antiorario"""
+        # 1. Ruota la faccia superiore stessa
+        self.faces['up'] = self.rotate_face_counter_clockwise(self.faces['up'])
+        
+        # 2. Ruota le righe superiori delle facce adiacenti
+        # Salva la riga superiore della faccia frontale
+        temp_row = self.faces['front'][0][:]
+        
+        # Sposta le righe: front <- left <- back <- right <- front
+        self.faces['front'][0] = self.faces['left'][0][:]
+        self.faces['left'][0] = self.faces['back'][0][:]
+        self.faces['back'][0] = self.faces['right'][0][:]
+        self.faces['right'][0] = temp_row
+    
+    def is_solved(self):
+        """Controlla se il cubo è risolto (ogni faccia ha un colore uniforme)"""
+        for face_name, face in self.faces.items():
+            first_color = face[0][0]
+            for row in face:
+                for color in row:
+                    if color != first_color:
+                        return False
+        return True
+    
+    def print_state(self):
+        """Stampa lo stato corrente del cubo per debug"""
+        print("\n=== STATO CUBO DI RUBIK ===")
+        for face_name, face in self.faces.items():
+            print(f"{face_name.upper()}:")
+            for row in face:
+                print(f"  {' '.join(row)}")
+        print("=========================\n")
+    
+    def get_face_colors(self):
+        """Restituisce i colori centrali di ogni faccia (per identificazione)"""
+        return {
+            face_name: face[1][1]  # Colore centrale
+            for face_name, face in self.faces.items()
+        }
