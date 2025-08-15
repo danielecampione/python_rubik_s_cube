@@ -71,6 +71,36 @@ class RubiksCubeModel:
         self.faces['back'][0] = self.faces['right'][0][:]
         self.faces['right'][0] = temp_row
     
+    def rotate_down_clockwise(self):
+        """Ruota la faccia inferiore in senso orario"""
+        # 1. Ruota la faccia inferiore stessa
+        self.faces['down'] = self.rotate_face_clockwise(self.faces['down'])
+        
+        # 2. Ruota le righe inferiori delle facce adiacenti
+        # Salva la riga inferiore della faccia frontale
+        temp_row = self.faces['front'][2][:]
+        
+        # Sposta le righe: front <- left <- back <- right <- front (stesso verso della superiore)
+        self.faces['front'][2] = self.faces['left'][2][:]
+        self.faces['left'][2] = self.faces['back'][2][:]
+        self.faces['back'][2] = self.faces['right'][2][:]
+        self.faces['right'][2] = temp_row
+    
+    def rotate_down_counter_clockwise(self):
+        """Ruota la faccia inferiore in senso antiorario"""
+        # 1. Ruota la faccia inferiore stessa
+        self.faces['down'] = self.rotate_face_counter_clockwise(self.faces['down'])
+        
+        # 2. Ruota le righe inferiori delle facce adiacenti
+        # Salva la riga inferiore della faccia frontale
+        temp_row = self.faces['front'][2][:]
+        
+        # Sposta le righe: front <- right <- back <- left <- front (opposto della superiore)
+        self.faces['front'][2] = self.faces['right'][2][:]
+        self.faces['right'][2] = self.faces['back'][2][:]
+        self.faces['back'][2] = self.faces['left'][2][:]
+        self.faces['left'][2] = temp_row
+    
     def is_solved(self):
         """Controlla se il cubo è risolto (ogni faccia ha un colore uniforme)"""
         for face_name, face in self.faces.items():

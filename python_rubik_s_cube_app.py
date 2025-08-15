@@ -39,22 +39,35 @@ class RubiksCubeApp:
                                font=('Arial', 16, 'bold'))
         title_label.grid(row=0, column=0, columnspan=2, pady=(0, 20))
         
-        # Sezione rotazioni
-        rotation_frame = ttk.LabelFrame(main_frame, text="Rotazione Faccia Superiore", padding="10")
-        rotation_frame.grid(row=1, column=0, columnspan=2, pady=(0, 20), sticky=(tk.W, tk.E))
+        # Sezione rotazioni faccia superiore
+        rotation_up_frame = ttk.LabelFrame(main_frame, text="Rotazione Faccia Superiore", padding="10")
+        rotation_up_frame.grid(row=1, column=0, columnspan=2, pady=(0, 10), sticky=(tk.W, tk.E))
         
-        # Pulsanti rotazione
-        self.btn_clockwise = ttk.Button(rotation_frame, text="Ruota Orario", 
-                                       command=self.rotate_clockwise)
-        self.btn_clockwise.grid(row=0, column=0, padx=(0, 10))
+        # Pulsanti rotazione superiore
+        self.btn_up_clockwise = ttk.Button(rotation_up_frame, text="Ruota Orario", 
+                                          command=self.rotate_up_clockwise)
+        self.btn_up_clockwise.grid(row=0, column=0, padx=(0, 10))
         
-        self.btn_counter_clockwise = ttk.Button(rotation_frame, text="Ruota Antiorario", 
-                                               command=self.rotate_counter_clockwise)
-        self.btn_counter_clockwise.grid(row=0, column=1)
+        self.btn_up_counter_clockwise = ttk.Button(rotation_up_frame, text="Ruota Antiorario", 
+                                                  command=self.rotate_up_counter_clockwise)
+        self.btn_up_counter_clockwise.grid(row=0, column=1)
+        
+        # Sezione rotazioni faccia inferiore
+        rotation_down_frame = ttk.LabelFrame(main_frame, text="Rotazione Faccia Inferiore", padding="10")
+        rotation_down_frame.grid(row=2, column=0, columnspan=2, pady=(0, 20), sticky=(tk.W, tk.E))
+        
+        # Pulsanti rotazione inferiore
+        self.btn_down_clockwise = ttk.Button(rotation_down_frame, text="Ruota Orario", 
+                                            command=self.rotate_down_clockwise)
+        self.btn_down_clockwise.grid(row=0, column=0, padx=(0, 10))
+        
+        self.btn_down_counter_clockwise = ttk.Button(rotation_down_frame, text="Ruota Antiorario", 
+                                                    command=self.rotate_down_counter_clockwise)
+        self.btn_down_counter_clockwise.grid(row=0, column=1)
         
         # Sezione controlli
         control_frame = ttk.LabelFrame(main_frame, text="Controlli", padding="10")
-        control_frame.grid(row=2, column=0, columnspan=2, pady=(0, 20), sticky=(tk.W, tk.E))
+        control_frame.grid(row=3, column=0, columnspan=2, pady=(0, 20), sticky=(tk.W, tk.E))
         
         # Pulsante reset
         self.btn_reset = ttk.Button(control_frame, text="Reset Cubo", 
@@ -69,25 +82,43 @@ class RubiksCubeApp:
         # Label di stato
         self.status_label = ttk.Label(main_frame, text="Pronto", 
                                      foreground="green", font=('Arial', 10))
-        self.status_label.grid(row=3, column=0, columnspan=2, pady=(10, 0))
+        self.status_label.grid(row=4, column=0, columnspan=2, pady=(10, 0))
     
-    def rotate_clockwise(self):
+    def rotate_up_clockwise(self):
         """Ruota la faccia superiore in senso orario"""
         if self.is_animating:
             return
         
         self.set_animating(True)
-        self.status_label.config(text="Rotazione oraria in corso...", foreground="orange")
+        self.status_label.config(text="Rotazione superiore oraria in corso...", foreground="orange")
         self.cube_3d.rotate_face('up', 'clockwise', self.on_rotation_complete)
     
-    def rotate_counter_clockwise(self):
+    def rotate_up_counter_clockwise(self):
         """Ruota la faccia superiore in senso antiorario"""
         if self.is_animating:
             return
         
         self.set_animating(True)
-        self.status_label.config(text="Rotazione antioraria in corso...", foreground="orange")
+        self.status_label.config(text="Rotazione superiore antioraria in corso...", foreground="orange")
         self.cube_3d.rotate_face('up', 'counter-clockwise', self.on_rotation_complete)
+    
+    def rotate_down_clockwise(self):
+        """Ruota la faccia inferiore in senso orario"""
+        if self.is_animating:
+            return
+        
+        self.set_animating(True)
+        self.status_label.config(text="Rotazione inferiore oraria in corso...", foreground="orange")
+        self.cube_3d.rotate_face('down', 'clockwise', self.on_rotation_complete)
+    
+    def rotate_down_counter_clockwise(self):
+        """Ruota la faccia inferiore in senso antiorario"""
+        if self.is_animating:
+            return
+        
+        self.set_animating(True)
+        self.status_label.config(text="Rotazione inferiore antioraria in corso...", foreground="orange")
+        self.cube_3d.rotate_face('down', 'counter-clockwise', self.on_rotation_complete)
     
     def reset_cube(self):
         """Resetta il cubo allo stato iniziale"""
@@ -114,8 +145,10 @@ class RubiksCubeApp:
         self.is_animating = animating
         state = 'disabled' if animating else 'normal'
         
-        self.btn_clockwise.config(state=state)
-        self.btn_counter_clockwise.config(state=state)
+        self.btn_up_clockwise.config(state=state)
+        self.btn_up_counter_clockwise.config(state=state)
+        self.btn_down_clockwise.config(state=state)
+        self.btn_down_counter_clockwise.config(state=state)
         self.btn_reset.config(state=state)
     
     def update_loop(self):

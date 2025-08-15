@@ -48,7 +48,7 @@ class RubiksCube3D:
             title="Cubo di Rubik 3D",
             width=800,
             height=600,
-            background=vp.color.gray(0.2)
+            background=vp.color.gray(0.8)
         )
         
         # Posiziona la camera per una vista ottimale
@@ -170,9 +170,21 @@ class RubiksCube3D:
         if self.is_animating:
             return
         
+        # Rimuovi tutti gli oggetti esistenti
+        for cubie in self.cubies.values():
+            cubie.visible = False
+            del cubie
+        for sticker in self.stickers.values():
+            sticker.visible = False
+            del sticker
+        
+        # Resetta il modello logico
         self.model.reset()
-        # Aggiorna tutte le facce durante il reset
+        
+        # Ricrea il cubo da zero
+        self.create_cube()
         self.update_colors()
+        
         print("Cubo resettato allo stato iniziale")
     
     def rotate_face(self, face_name, direction, callback=None):
@@ -180,7 +192,7 @@ class RubiksCube3D:
         if self.is_animating:
             return
         
-        if face_name != 'up':
+        if face_name not in ['up', 'down']:
             print(f"Rotazione di {face_name} non ancora implementata")
             if callback:
                 callback()
@@ -208,38 +220,76 @@ class RubiksCube3D:
             steps = 30  # Numero di frame dell'animazione
             angle_per_step = total_angle / steps
             
-            # Identifica gli oggetti da ruotare (faccia superiore)
+            # Identifica gli oggetti da ruotare
             objects_to_rotate = []
             
-            # Aggiungi i cubetti della faccia superiore
-            for x in range(3):
+            if face_name == 'up':
+                # Aggiungi i cubetti della faccia superiore
+                for x in range(3):
+                    for z in range(3):
+                        objects_to_rotate.append(self.cubies[(x, 2, z)])
+                
+                # Aggiungi gli sticker della faccia superiore
+                for x in range(3):
+                    for z in range(3):
+                        if ('up', x, z) in self.stickers:
+                            objects_to_rotate.append(self.stickers[('up', x, z)])
+                
+                # Aggiungi gli sticker dei bordi adiacenti
+                for x in range(3):
+                    # Sticker frontali del bordo superiore
+                    if ('front', x, 2) in self.stickers:
+                        objects_to_rotate.append(self.stickers[('front', x, 2)])
+                    # Sticker posteriori del bordo superiore
+                    if ('back', x, 2) in self.stickers:
+                        objects_to_rotate.append(self.stickers[('back', x, 2)])
+                
                 for z in range(3):
-                    objects_to_rotate.append(self.cubies[(x, 2, z)])
-            
-            # Aggiungi gli sticker della faccia superiore
-            for x in range(3):
+                    # Sticker destri del bordo superiore
+                    if ('right', z, 2) in self.stickers:
+                        objects_to_rotate.append(self.stickers[('right', z, 2)])
+                    # Sticker sinistri del bordo superiore
+                    if ('left', z, 2) in self.stickers:
+                        objects_to_rotate.append(self.stickers[('left', z, 2)])
+                
+                # Parametri rotazione per faccia superiore
+                rotation_axis = vp.vector(0, 1, 0)
+                rotation_origin = vp.vector(0, (self.cube_size + self.gap), 0)
+                
+            elif face_name == 'down':
+                # Aggiungi i cubetti della faccia inferiore
+                for x in range(3):
+                    for z in range(3):
+                        objects_to_rotate.append(self.cubies[(x, 0, z)])
+                
+                # Aggiungi gli sticker della faccia inferiore
+                for x in range(3):
+                    for z in range(3):
+                        if ('down', x, z) in self.stickers:
+                            objects_to_rotate.append(self.stickers[('down', x, z)])
+                
+                # Aggiungi gli sticker dei bordi adiacenti
+                for x in range(3):
+                    # Sticker frontali del bordo inferiore
+                    if ('front', x, 0) in self.stickers:
+                        objects_to_rotate.append(self.stickers[('front', x, 0)])
+                    # Sticker posteriori del bordo inferiore
+                    if ('back', x, 0) in self.stickers:
+                        objects_to_rotate.append(self.stickers[('back', x, 0)])
+                
                 for z in range(3):
-                    if ('up', x, z) in self.stickers:
-                        objects_to_rotate.append(self.stickers[('up', x, z)])
+                    # Sticker destri del bordo inferiore
+                    if ('right', z, 0) in self.stickers:
+                        objects_to_rotate.append(self.stickers[('right', z, 0)])
+                    # Sticker sinistri del bordo inferiore
+                    if ('left', z, 0) in self.stickers:
+                        objects_to_rotate.append(self.stickers[('left', z, 0)])
+                
+                # Parametri rotazione per faccia inferiore
+                rotation_axis = vp.vector(0, 1, 0)
+                rotation_origin = vp.vector(0, -(self.cube_size + self.gap), 0)
             
-            # Aggiungi gli sticker dei bordi adiacenti
-            for x in range(3):
-                # Sticker frontali del bordo superiore
-                if ('front', x, 2) in self.stickers:
-                    objects_to_rotate.append(self.stickers[('front', x, 2)])
-                # Sticker posteriori del bordo superiore
-                if ('back', x, 2) in self.stickers:
-                    objects_to_rotate.append(self.stickers[('back', x, 2)])
-            
-            for z in range(3):
-                # Sticker destri del bordo superiore
-                if ('right', z, 2) in self.stickers:
-                    objects_to_rotate.append(self.stickers[('right', z, 2)])
-                # Sticker sinistri del bordo superiore
-                if ('left', z, 2) in self.stickers:
-                    objects_to_rotate.append(self.stickers[('left', z, 2)])
-            
-            print(f"Animando rotazione {direction} della faccia superiore...")
+            print(f"Animando rotazione {direction} della faccia {face_name}...")
             print(f"Oggetti da ruotare: {len(objects_to_rotate)}")
             
             # Esegui l'animazione
@@ -247,16 +297,22 @@ class RubiksCube3D:
                 for obj in objects_to_rotate:
                     obj.rotate(
                         angle=angle_per_step,
-                        axis=vp.vector(0, 1, 0),
-                        origin=vp.vector(0, (self.cube_size + self.gap), 0)
+                        axis=rotation_axis,
+                        origin=rotation_origin
                     )
                 time.sleep(0.02)  # 50 FPS
             
             # Applica la rotazione logica
-            if direction == 'clockwise':
-                self.model.rotate_up_clockwise()
-            else:
-                self.model.rotate_up_counter_clockwise()
+            if face_name == 'up':
+                if direction == 'clockwise':
+                    self.model.rotate_up_clockwise()
+                else:
+                    self.model.rotate_up_counter_clockwise()
+            elif face_name == 'down':
+                if direction == 'clockwise':
+                    self.model.rotate_down_clockwise()
+                else:
+                    self.model.rotate_down_counter_clockwise()
             
             # NON aggiornare i colori dopo l'animazione fisica!
             # La rotazione fisica ha già posizionato gli sticker correttamente
