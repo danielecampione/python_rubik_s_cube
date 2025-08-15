@@ -192,7 +192,7 @@ class RubiksCube3D:
         if self.is_animating:
             return
         
-        if face_name not in ['up', 'down']:
+        if face_name not in ['up', 'down', 'middle']:
             print(f"Rotazione di {face_name} non ancora implementata")
             if callback:
                 callback()
@@ -288,6 +288,33 @@ class RubiksCube3D:
                 # Parametri rotazione per faccia inferiore
                 rotation_axis = vp.vector(0, 1, 0)
                 rotation_origin = vp.vector(0, -(self.cube_size + self.gap), 0)
+                
+            elif face_name == 'middle':
+                # Aggiungi i cubetti della fascia centrale (y = 1)
+                for x in range(3):
+                    for z in range(3):
+                        objects_to_rotate.append(self.cubies[(x, 1, z)])
+                
+                # Aggiungi gli sticker dei bordi centrali
+                for x in range(3):
+                    # Sticker frontali del bordo centrale
+                    if ('front', x, 1) in self.stickers:
+                        objects_to_rotate.append(self.stickers[('front', x, 1)])
+                    # Sticker posteriori del bordo centrale
+                    if ('back', x, 1) in self.stickers:
+                        objects_to_rotate.append(self.stickers[('back', x, 1)])
+                
+                for z in range(3):
+                    # Sticker destri del bordo centrale
+                    if ('right', z, 1) in self.stickers:
+                        objects_to_rotate.append(self.stickers[('right', z, 1)])
+                    # Sticker sinistri del bordo centrale
+                    if ('left', z, 1) in self.stickers:
+                        objects_to_rotate.append(self.stickers[('left', z, 1)])
+                
+                # Parametri rotazione per fascia centrale
+                rotation_axis = vp.vector(0, 1, 0)
+                rotation_origin = vp.vector(0, 0, 0)
             
             print(f"Animando rotazione {direction} della faccia {face_name}...")
             print(f"Oggetti da ruotare: {len(objects_to_rotate)}")
@@ -313,6 +340,11 @@ class RubiksCube3D:
                     self.model.rotate_down_clockwise()
                 else:
                     self.model.rotate_down_counter_clockwise()
+            elif face_name == 'middle':
+                if direction == 'clockwise':
+                    self.model.rotate_middle_clockwise()
+                else:
+                    self.model.rotate_middle_counter_clockwise()
             
             # NON aggiornare i colori dopo l'animazione fisica!
             # La rotazione fisica ha già posizionato gli sticker correttamente

@@ -13,7 +13,7 @@ class RubiksCubeApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Cubo di Rubik 3D")
-        self.root.geometry("400x300")
+        self.root.geometry("400x450")
         self.root.resizable(False, False)
         
         # Inizializza il cubo 3D
@@ -52,9 +52,22 @@ class RubiksCubeApp:
                                                   command=self.rotate_up_counter_clockwise)
         self.btn_up_counter_clockwise.grid(row=0, column=1)
         
+        # Sezione rotazioni fascia centrale
+        rotation_middle_frame = ttk.LabelFrame(main_frame, text="Rotazione Fascia Centrale", padding="10")
+        rotation_middle_frame.grid(row=2, column=0, columnspan=2, pady=(0, 10), sticky=(tk.W, tk.E))
+        
+        # Pulsanti rotazione centrale
+        self.btn_middle_clockwise = ttk.Button(rotation_middle_frame, text="Ruota Orario", 
+                                              command=self.rotate_middle_clockwise)
+        self.btn_middle_clockwise.grid(row=0, column=0, padx=(0, 10))
+        
+        self.btn_middle_counter_clockwise = ttk.Button(rotation_middle_frame, text="Ruota Antiorario", 
+                                                      command=self.rotate_middle_counter_clockwise)
+        self.btn_middle_counter_clockwise.grid(row=0, column=1)
+        
         # Sezione rotazioni faccia inferiore
         rotation_down_frame = ttk.LabelFrame(main_frame, text="Rotazione Faccia Inferiore", padding="10")
-        rotation_down_frame.grid(row=2, column=0, columnspan=2, pady=(0, 20), sticky=(tk.W, tk.E))
+        rotation_down_frame.grid(row=3, column=0, columnspan=2, pady=(0, 20), sticky=(tk.W, tk.E))
         
         # Pulsanti rotazione inferiore
         self.btn_down_clockwise = ttk.Button(rotation_down_frame, text="Ruota Orario", 
@@ -67,7 +80,7 @@ class RubiksCubeApp:
         
         # Sezione controlli
         control_frame = ttk.LabelFrame(main_frame, text="Controlli", padding="10")
-        control_frame.grid(row=3, column=0, columnspan=2, pady=(0, 20), sticky=(tk.W, tk.E))
+        control_frame.grid(row=4, column=0, columnspan=2, pady=(0, 20), sticky=(tk.W, tk.E))
         
         # Pulsante reset
         self.btn_reset = ttk.Button(control_frame, text="Reset Cubo", 
@@ -82,7 +95,7 @@ class RubiksCubeApp:
         # Label di stato
         self.status_label = ttk.Label(main_frame, text="Pronto", 
                                      foreground="green", font=('Arial', 10))
-        self.status_label.grid(row=4, column=0, columnspan=2, pady=(10, 0))
+        self.status_label.grid(row=5, column=0, columnspan=2, pady=(10, 0))
     
     def rotate_up_clockwise(self):
         """Ruota la faccia superiore in senso orario"""
@@ -120,6 +133,24 @@ class RubiksCubeApp:
         self.status_label.config(text="Rotazione inferiore antioraria in corso...", foreground="orange")
         self.cube_3d.rotate_face('down', 'counter-clockwise', self.on_rotation_complete)
     
+    def rotate_middle_clockwise(self):
+        """Ruota la fascia centrale in senso orario"""
+        if self.is_animating:
+            return
+        
+        self.set_animating(True)
+        self.status_label.config(text="Rotazione centrale oraria in corso...", foreground="orange")
+        self.cube_3d.rotate_face('middle', 'clockwise', self.on_rotation_complete)
+    
+    def rotate_middle_counter_clockwise(self):
+        """Ruota la fascia centrale in senso antiorario"""
+        if self.is_animating:
+            return
+        
+        self.set_animating(True)
+        self.status_label.config(text="Rotazione centrale antioraria in corso...", foreground="orange")
+        self.cube_3d.rotate_face('middle', 'counter-clockwise', self.on_rotation_complete)
+    
     def reset_cube(self):
         """Resetta il cubo allo stato iniziale"""
         if self.is_animating:
@@ -147,6 +178,8 @@ class RubiksCubeApp:
         
         self.btn_up_clockwise.config(state=state)
         self.btn_up_counter_clockwise.config(state=state)
+        self.btn_middle_clockwise.config(state=state)
+        self.btn_middle_counter_clockwise.config(state=state)
         self.btn_down_clockwise.config(state=state)
         self.btn_down_counter_clockwise.config(state=state)
         self.btn_reset.config(state=state)
