@@ -17,10 +17,10 @@ class RubiksCubeModel:
         self.faces = {
             'up': [['W', 'W', 'W'], ['W', 'W', 'W'], ['W', 'W', 'W']],      # Superiore - Bianco
             'down': [['Y', 'Y', 'Y'], ['Y', 'Y', 'Y'], ['Y', 'Y', 'Y']],    # Inferiore - Giallo
-            'front': [['R', 'R', 'R'], ['R', 'R', 'R'], ['R', 'R', 'R']],   # Frontale - Rosso
-            'back': [['O', 'O', 'O'], ['O', 'O', 'O'], ['O', 'O', 'O']],    # Posteriore - Arancione
-            'right': [['B', 'B', 'B'], ['B', 'B', 'B'], ['B', 'B', 'B']],   # Destra - Blu
-            'left': [['G', 'G', 'G'], ['G', 'G', 'G'], ['G', 'G', 'G']]     # Sinistra - Verde
+            'front': [['B', 'B', 'B'], ['B', 'B', 'B'], ['B', 'B', 'B']],   # Frontale - Blu
+            'back': [['G', 'G', 'G'], ['G', 'G', 'G'], ['G', 'G', 'G']],    # Posteriore - Verde
+            'right': [['R', 'R', 'R'], ['R', 'R', 'R'], ['R', 'R', 'R']],   # Destra - Rosso
+            'left': [['O', 'O', 'O'], ['O', 'O', 'O'], ['O', 'O', 'O']]     # Sinistra - Arancione
         }
     
     def get_face(self, face_name):

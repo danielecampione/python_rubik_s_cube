@@ -11,6 +11,26 @@ import threading
 import time
 from rubiks_cube_model import RubiksCubeModel
 
+# I colori primigeni, come le quattro qualità elementari della fisica antica
+SOLVED_COLORS = {
+    'up': "white",     # Bianco come la purezza del cielo empireo
+    'down': "yellow",  # Giallo come l'oro degli alchimisti
+    'front': "blue",   # Azzurro come il manto della Vergine
+    'back': "green",   # Verde come i prati di primavera
+    'right': "red",    # Rosso come il fuoco trasformatore
+    'left': "orange"   # Arancio come il sole al tramonto
+}
+
+# La traduzione dei colori in numeri, come il sapiente che riduce le qualità sensibili a proporzioni matematiche
+VPYTHON_COLORS = {
+    "white": vp.vector(1, 1, 1),      # Bianco, somma di tutti i colori, come la luce divina
+    "yellow": vp.vector(1, 0.9, 0),   # Giallo, colore dell'intelletto e della saggezza
+    "blue": vp.vector(0, 0.4, 1),     # Azzurro, colore del cielo e dell'infinito
+    "green": vp.vector(0, 0.8, 0.2),  # Verde, colore della natura e della vita
+    "red": vp.vector(1, 0.1, 0),      # Rosso, colore della passione e del sangue
+    "orange": vp.vector(1, 0.4, 0)    # Arancio, colore del calore e dell'energia
+}
+
 class RubiksCube3D:
     def __init__(self):
         """Inizializza il cubo 3D"""
@@ -28,12 +48,12 @@ class RubiksCube3D:
         
         # Colori delle facce
         self.colors = {
-            'W': vp.color.white,
-            'Y': vp.color.yellow,
-            'R': vp.color.red,
-            'O': vp.color.orange,
-            'B': vp.color.blue,
-            'G': vp.color.green
+            'W': VPYTHON_COLORS["white"],
+            'Y': VPYTHON_COLORS["yellow"],
+            'B': VPYTHON_COLORS["blue"],
+            'G': VPYTHON_COLORS["green"],
+            'R': VPYTHON_COLORS["red"],
+            'O': VPYTHON_COLORS["orange"]
         }
         
         # Inizializza la scena 3D
@@ -48,17 +68,20 @@ class RubiksCube3D:
             title="Cubo di Rubik 3D",
             width=800,
             height=600,
-            background=vp.color.gray(0.8)
+            background=vp.color.gray(0.95)  # Sfondo molto più chiaro
         )
+        
+        # Le luci, come i luminari che Dio pose nel firmamento per rischiarare la terra
+        vp.distant_light(direction=vp.vector(1,2,1), color=vp.color.gray(0.9))
+        vp.distant_light(direction=vp.vector(-1,-2,-0.5), color=vp.color.gray(0.7))
+        vp.distant_light(direction=vp.vector(0,1,0), color=vp.color.gray(0.5))
+        # La luce ambiente, come l'etere che tutto permea
+        self.scene.ambient = vp.color.gray(0.3)
         
         # Posiziona la camera per una vista ottimale
         self.scene.camera.pos = vp.vector(6, 4, 6)
         self.scene.camera.axis = vp.vector(-6, -4, -6)
         self.scene.up = vp.vector(0, 1, 0)
-        
-        # Aggiungi illuminazione
-        vp.distant_light(direction=vp.vector(1, 1, 1), color=vp.color.white)
-        vp.distant_light(direction=vp.vector(-1, -1, -1), color=vp.color.gray(0.5))
     
     def create_cube(self):
         """Crea la struttura 3D del cubo"""
@@ -80,7 +103,12 @@ class RubiksCube3D:
                     cubie = vp.box(
                         pos=pos,
                         size=vp.vector(self.cube_size, self.cube_size, self.cube_size),
-                        color=vp.color.black
+                        color=vp.color.gray(0.2),
+                        ambient=0.2,
+                        diffuse=0.7,
+                        specular=0.8,
+                        shininess=1.0,
+                        emissive=vp.color.gray(0.05)
                     )
                     self.cubies[(x, y, z)] = cubie
                     
@@ -97,7 +125,8 @@ class RubiksCube3D:
             sticker = vp.box(
                 pos=pos + vp.vector(0, offset, 0),
                 size=vp.vector(self.sticker_size, sticker_thickness, self.sticker_size),
-                color=vp.color.white
+                color=VPYTHON_COLORS[SOLVED_COLORS['up']],
+                shininess=0.5
             )
             self.stickers[('up', x, z)] = sticker
         
@@ -106,7 +135,8 @@ class RubiksCube3D:
             sticker = vp.box(
                 pos=pos + vp.vector(0, -offset, 0),
                 size=vp.vector(self.sticker_size, sticker_thickness, self.sticker_size),
-                color=vp.color.yellow
+                color=VPYTHON_COLORS[SOLVED_COLORS['down']],
+                shininess=0.5
             )
             self.stickers[('down', x, z)] = sticker
         
@@ -115,7 +145,8 @@ class RubiksCube3D:
             sticker = vp.box(
                 pos=pos + vp.vector(0, 0, offset),
                 size=vp.vector(self.sticker_size, self.sticker_size, sticker_thickness),
-                color=vp.color.red
+                color=VPYTHON_COLORS[SOLVED_COLORS['front']],
+                shininess=0.5
             )
             self.stickers[('front', x, y)] = sticker
         
@@ -124,7 +155,8 @@ class RubiksCube3D:
             sticker = vp.box(
                 pos=pos + vp.vector(0, 0, -offset),
                 size=vp.vector(self.sticker_size, self.sticker_size, sticker_thickness),
-                color=vp.color.orange
+                color=VPYTHON_COLORS[SOLVED_COLORS['back']],
+                shininess=0.5
             )
             self.stickers[('back', x, y)] = sticker
         
@@ -133,7 +165,8 @@ class RubiksCube3D:
             sticker = vp.box(
                 pos=pos + vp.vector(offset, 0, 0),
                 size=vp.vector(sticker_thickness, self.sticker_size, self.sticker_size),
-                color=vp.color.blue
+                color=VPYTHON_COLORS[SOLVED_COLORS['right']],
+                shininess=0.5
             )
             self.stickers[('right', z, y)] = sticker
         
@@ -142,7 +175,8 @@ class RubiksCube3D:
             sticker = vp.box(
                 pos=pos + vp.vector(-offset, 0, 0),
                 size=vp.vector(sticker_thickness, self.sticker_size, self.sticker_size),
-                color=vp.color.green
+                color=VPYTHON_COLORS[SOLVED_COLORS['left']],
+                shininess=0.5
             )
             self.stickers[('left', z, y)] = sticker
     
