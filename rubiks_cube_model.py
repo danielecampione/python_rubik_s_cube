@@ -123,6 +123,39 @@ class RubiksCubeModel:
         self.faces['back'][1] = self.faces['left'][1][:]
         self.faces['left'][1] = temp_row
     
+    def rotate_left_vertical_clockwise(self):
+        """Ruota la fascia verticale sinistra in senso orario (vista da sinistra)"""
+        # 1. Ruota la faccia sinistra stessa
+        self.faces['left'] = self.rotate_face_clockwise(self.faces['left'])
+        
+        # 2. Ruota le colonne sinistre delle facce adiacenti
+        # Salva la colonna sinistra della faccia superiore
+        temp_col = [self.faces['up'][i][0] for i in range(3)]
+        
+        # Sposta le colonne: up <- back <- down <- front <- up
+        # Nota: la faccia back è vista da dietro, quindi le colonne sono invertite
+        for i in range(3):
+            self.faces['up'][i][0] = self.faces['front'][i][0]
+            self.faces['front'][i][0] = self.faces['down'][i][0]
+            self.faces['down'][i][0] = self.faces['back'][2-i][2]  # Colonna destra di back (invertita)
+            self.faces['back'][2-i][2] = temp_col[i]
+    
+    def rotate_left_vertical_counter_clockwise(self):
+        """Ruota la fascia verticale sinistra in senso antiorario (vista da sinistra)"""
+        # 1. Ruota la faccia sinistra stessa
+        self.faces['left'] = self.rotate_face_counter_clockwise(self.faces['left'])
+        
+        # 2. Ruota le colonne sinistre delle facce adiacenti
+        # Salva la colonna sinistra della faccia superiore
+        temp_col = [self.faces['up'][i][0] for i in range(3)]
+        
+        # Sposta le colonne: up <- back <- down <- front <- up (direzione opposta)
+        for i in range(3):
+            self.faces['up'][i][0] = self.faces['back'][2-i][2]  # Colonna destra di back (invertita)
+            self.faces['back'][2-i][2] = self.faces['down'][i][0]
+            self.faces['down'][i][0] = self.faces['front'][i][0]
+            self.faces['front'][i][0] = temp_col[i]
+    
     def is_solved(self):
         """Controlla se il cubo è risolto (ogni faccia ha un colore uniforme)"""
         for face_name, face in self.faces.items():
