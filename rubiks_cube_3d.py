@@ -256,7 +256,7 @@ class RubiksCube3D:
         if self.is_animating:
             return
         
-        if face_name not in ['up', 'down', 'middle', 'left_vertical']:
+        if face_name not in ['up', 'down', 'middle', 'left_vertical', 'center_vertical', 'right_vertical']:
             print(f"Rotazione di {face_name} non ancora implementata")
             if callback:
                 callback()
@@ -352,6 +352,10 @@ class RubiksCube3D:
             return 'y', 1, vp.vector(0, 1, 0), vp.vector(0, 0, 0)
         elif face_name == 'left_vertical':
             return 'x', 0, vp.vector(1, 0, 0), vp.vector(-(self.cube_size + self.gap), 0, 0)
+        elif face_name == 'center_vertical':
+            return 'x', 1, vp.vector(1, 0, 0), vp.vector(0, 0, 0)
+        elif face_name == 'right_vertical':
+            return 'x', 2, vp.vector(1, 0, 0), vp.vector((self.cube_size + self.gap), 0, 0)
         else:
             raise ValueError(f"Face name non supportato: {face_name}")
     
@@ -425,6 +429,16 @@ class RubiksCube3D:
                 self.model.rotate_left_vertical_clockwise()
             else:
                 self.model.rotate_left_vertical_counter_clockwise()
+        elif face_name == 'center_vertical':
+            if direction == 'clockwise':
+                self.model.rotate_center_vertical_clockwise()
+            else:
+                self.model.rotate_center_vertical_counter_clockwise()
+        elif face_name == 'right_vertical':
+            if direction == 'clockwise':
+                self.model.rotate_right_vertical_clockwise()
+            else:
+                self.model.rotate_right_vertical_counter_clockwise()
 
     def fix_rotation_precision(self, rotated_objects, face_name):
         """Corregge le imprecisioni di rotazione senza distruggere gli oggetti"""

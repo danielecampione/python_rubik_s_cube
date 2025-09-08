@@ -156,6 +156,62 @@ class RubiksCubeModel:
             self.faces['down'][i][0] = self.faces['front'][i][0]
             self.faces['front'][i][0] = temp_col[i]
     
+    def rotate_center_vertical_clockwise(self):
+        """Ruota la fascia verticale centrale in senso orario (vista da sinistra)"""
+        # Salva la colonna centrale della faccia superiore
+        temp_col = [self.faces['up'][i][1] for i in range(3)]
+        
+        # Sposta le colonne centrali: up <- front <- down <- back <- up
+        for i in range(3):
+            self.faces['up'][i][1] = self.faces['front'][i][1]
+            self.faces['front'][i][1] = self.faces['down'][i][1]
+            self.faces['down'][i][1] = self.faces['back'][2-i][1]  # Colonna centrale di back (invertita)
+            self.faces['back'][2-i][1] = temp_col[i]
+    
+    def rotate_center_vertical_counter_clockwise(self):
+        """Ruota la fascia verticale centrale in senso antiorario (vista da sinistra)"""
+        # Salva la colonna centrale della faccia superiore
+        temp_col = [self.faces['up'][i][1] for i in range(3)]
+        
+        # Sposta le colonne centrali: up <- back <- down <- front <- up (direzione opposta)
+        for i in range(3):
+            self.faces['up'][i][1] = self.faces['back'][2-i][1]  # Colonna centrale di back (invertita)
+            self.faces['back'][2-i][1] = self.faces['down'][i][1]
+            self.faces['down'][i][1] = self.faces['front'][i][1]
+            self.faces['front'][i][1] = temp_col[i]
+    
+    def rotate_right_vertical_clockwise(self):
+        """Ruota la fascia verticale destra in senso orario (vista da sinistra)"""
+        # 1. Ruota la faccia destra stessa
+        self.faces['right'] = self.rotate_face_clockwise(self.faces['right'])
+        
+        # 2. Ruota le colonne destre delle facce adiacenti
+        # Salva la colonna destra della faccia superiore
+        temp_col = [self.faces['up'][i][2] for i in range(3)]
+        
+        # Sposta le colonne: up <- front <- down <- back <- up
+        for i in range(3):
+            self.faces['up'][i][2] = self.faces['front'][i][2]
+            self.faces['front'][i][2] = self.faces['down'][i][2]
+            self.faces['down'][i][2] = self.faces['back'][2-i][0]  # Colonna sinistra di back (invertita)
+            self.faces['back'][2-i][0] = temp_col[i]
+    
+    def rotate_right_vertical_counter_clockwise(self):
+        """Ruota la fascia verticale destra in senso antiorario (vista da sinistra)"""
+        # 1. Ruota la faccia destra stessa
+        self.faces['right'] = self.rotate_face_counter_clockwise(self.faces['right'])
+        
+        # 2. Ruota le colonne destre delle facce adiacenti
+        # Salva la colonna destra della faccia superiore
+        temp_col = [self.faces['up'][i][2] for i in range(3)]
+        
+        # Sposta le colonne: up <- back <- down <- front <- up (direzione opposta)
+        for i in range(3):
+            self.faces['up'][i][2] = self.faces['back'][2-i][0]  # Colonna sinistra di back (invertita)
+            self.faces['back'][2-i][0] = self.faces['down'][i][2]
+            self.faces['down'][i][2] = self.faces['front'][i][2]
+            self.faces['front'][i][2] = temp_col[i]
+    
     def is_solved(self):
         """Controlla se il cubo è risolto (ogni faccia ha un colore uniforme)"""
         for face_name, face in self.faces.items():

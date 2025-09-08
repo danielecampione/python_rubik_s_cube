@@ -13,7 +13,7 @@ class RubiksCubeApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Cubo di Rubik 3D")
-        self.root.geometry("400x600")
+        self.root.geometry("620x520")
         self.root.resizable(False, False)
         
         # Inizializza il cubo 3D
@@ -39,9 +39,13 @@ class RubiksCubeApp:
                                font=('Arial', 16, 'bold'))
         title_label.grid(row=0, column=0, columnspan=2, pady=(0, 20))
         
+        # Sezione rotazioni orizzontali (colonna sinistra)
+        horizontal_frame = ttk.LabelFrame(main_frame, text="Rotazioni Orizzontali", padding="10")
+        horizontal_frame.grid(row=1, column=0, padx=(0, 10), pady=(0, 10), sticky=(tk.W, tk.E, tk.N))
+        
         # Sezione rotazioni faccia superiore
-        rotation_up_frame = ttk.LabelFrame(main_frame, text="Rotazione Faccia Superiore", padding="10")
-        rotation_up_frame.grid(row=1, column=0, columnspan=2, pady=(0, 10), sticky=(tk.W, tk.E))
+        rotation_up_frame = ttk.LabelFrame(horizontal_frame, text="Faccia Superiore", padding="10")
+        rotation_up_frame.grid(row=0, column=0, pady=(0, 10), sticky=(tk.W, tk.E))
         
         # Pulsanti rotazione superiore
         self.btn_up_clockwise = ttk.Button(rotation_up_frame, text="Ruota Orario", 
@@ -53,8 +57,8 @@ class RubiksCubeApp:
         self.btn_up_counter_clockwise.grid(row=0, column=1)
         
         # Sezione rotazioni fascia centrale
-        rotation_middle_frame = ttk.LabelFrame(main_frame, text="Rotazione Fascia Centrale", padding="10")
-        rotation_middle_frame.grid(row=2, column=0, columnspan=2, pady=(0, 10), sticky=(tk.W, tk.E))
+        rotation_middle_frame = ttk.LabelFrame(horizontal_frame, text="Fascia Centrale", padding="10")
+        rotation_middle_frame.grid(row=1, column=0, pady=(0, 10), sticky=(tk.W, tk.E))
         
         # Pulsanti rotazione centrale
         self.btn_middle_clockwise = ttk.Button(rotation_middle_frame, text="Ruota Orario", 
@@ -66,8 +70,8 @@ class RubiksCubeApp:
         self.btn_middle_counter_clockwise.grid(row=0, column=1)
         
         # Sezione rotazioni faccia inferiore
-        rotation_down_frame = ttk.LabelFrame(main_frame, text="Rotazione Faccia Inferiore", padding="10")
-        rotation_down_frame.grid(row=3, column=0, columnspan=2, pady=(0, 20), sticky=(tk.W, tk.E))
+        rotation_down_frame = ttk.LabelFrame(horizontal_frame, text="Faccia Inferiore", padding="10")
+        rotation_down_frame.grid(row=2, column=0, pady=(0, 10), sticky=(tk.W, tk.E))
         
         # Pulsanti rotazione inferiore
         self.btn_down_clockwise = ttk.Button(rotation_down_frame, text="Ruota Orario", 
@@ -78,9 +82,13 @@ class RubiksCubeApp:
                                                     command=self.rotate_down_counter_clockwise)
         self.btn_down_counter_clockwise.grid(row=0, column=1)
         
+        # Sezione rotazioni verticali (colonna destra)
+        vertical_frame = ttk.LabelFrame(main_frame, text="Rotazioni Verticali", padding="10")
+        vertical_frame.grid(row=1, column=1, padx=(10, 0), pady=(0, 10), sticky=(tk.W, tk.E, tk.N))
+        
         # Sezione rotazione verticale sinistra
-        rotation_left_vertical_frame = ttk.LabelFrame(main_frame, text="Rotazione Verticale Sinistra", padding="10")
-        rotation_left_vertical_frame.grid(row=4, column=0, columnspan=2, pady=(0, 20), sticky=(tk.W, tk.E))
+        rotation_left_vertical_frame = ttk.LabelFrame(vertical_frame, text="Fascia Sinistra", padding="10")
+        rotation_left_vertical_frame.grid(row=0, column=0, pady=(0, 10), sticky=(tk.W, tk.E))
         
         # Pulsanti rotazione verticale sinistra
         self.btn_left_vertical_clockwise = ttk.Button(rotation_left_vertical_frame, text="Ruota Orario", 
@@ -91,9 +99,35 @@ class RubiksCubeApp:
                                                              command=self.rotate_left_vertical_counter_clockwise)
         self.btn_left_vertical_counter_clockwise.grid(row=0, column=1)
         
+        # Sezione rotazione verticale centrale
+        rotation_center_vertical_frame = ttk.LabelFrame(vertical_frame, text="Fascia Centrale", padding="10")
+        rotation_center_vertical_frame.grid(row=1, column=0, pady=(0, 10), sticky=(tk.W, tk.E))
+        
+        # Pulsanti rotazione verticale centrale
+        self.btn_center_vertical_clockwise = ttk.Button(rotation_center_vertical_frame, text="Ruota Orario", 
+                                                       command=self.rotate_center_vertical_clockwise)
+        self.btn_center_vertical_clockwise.grid(row=0, column=0, padx=(0, 10))
+        
+        self.btn_center_vertical_counter_clockwise = ttk.Button(rotation_center_vertical_frame, text="Ruota Antiorario", 
+                                                               command=self.rotate_center_vertical_counter_clockwise)
+        self.btn_center_vertical_counter_clockwise.grid(row=0, column=1)
+        
+        # Sezione rotazione verticale destra
+        rotation_right_vertical_frame = ttk.LabelFrame(vertical_frame, text="Fascia Destra", padding="10")
+        rotation_right_vertical_frame.grid(row=2, column=0, pady=(0, 10), sticky=(tk.W, tk.E))
+        
+        # Pulsanti rotazione verticale destra
+        self.btn_right_vertical_clockwise = ttk.Button(rotation_right_vertical_frame, text="Ruota Orario", 
+                                                      command=self.rotate_right_vertical_clockwise)
+        self.btn_right_vertical_clockwise.grid(row=0, column=0, padx=(0, 10))
+        
+        self.btn_right_vertical_counter_clockwise = ttk.Button(rotation_right_vertical_frame, text="Ruota Antiorario", 
+                                                              command=self.rotate_right_vertical_counter_clockwise)
+        self.btn_right_vertical_counter_clockwise.grid(row=0, column=1)
+        
         # Sezione controlli
         control_frame = ttk.LabelFrame(main_frame, text="Controlli", padding="10")
-        control_frame.grid(row=5, column=0, columnspan=2, pady=(0, 20), sticky=(tk.W, tk.E))
+        control_frame.grid(row=2, column=0, columnspan=2, pady=(10, 20), sticky=(tk.W, tk.E))
         
         # Pulsante reset
         self.btn_reset = ttk.Button(control_frame, text="Reset Cubo", 
@@ -108,7 +142,7 @@ class RubiksCubeApp:
         # Label di stato
         self.status_label = ttk.Label(main_frame, text="Pronto", 
                                      foreground="green", font=('Arial', 10))
-        self.status_label.grid(row=6, column=0, columnspan=2, pady=(10, 0))
+        self.status_label.grid(row=3, column=0, columnspan=2, pady=(10, 0))
     
     def rotate_up_clockwise(self):
         """Ruota la faccia superiore in senso orario"""
@@ -181,6 +215,42 @@ class RubiksCubeApp:
         self.set_animating(True)
         self.status_label.config(text="Rotazione verticale sinistra antioraria in corso...", foreground="orange")
         self.cube_3d.rotate_face('left_vertical', 'counter-clockwise', self.on_rotation_complete)
+    
+    def rotate_center_vertical_clockwise(self):
+        """Ruota la fascia verticale centrale in senso orario"""
+        if self.is_animating:
+            return
+        
+        self.set_animating(True)
+        self.status_label.config(text="Rotazione verticale centrale oraria in corso...", foreground="orange")
+        self.cube_3d.rotate_face('center_vertical', 'clockwise', self.on_rotation_complete)
+    
+    def rotate_center_vertical_counter_clockwise(self):
+        """Ruota la fascia verticale centrale in senso antiorario"""
+        if self.is_animating:
+            return
+        
+        self.set_animating(True)
+        self.status_label.config(text="Rotazione verticale centrale antioraria in corso...", foreground="orange")
+        self.cube_3d.rotate_face('center_vertical', 'counter-clockwise', self.on_rotation_complete)
+    
+    def rotate_right_vertical_clockwise(self):
+        """Ruota la fascia verticale destra in senso orario"""
+        if self.is_animating:
+            return
+        
+        self.set_animating(True)
+        self.status_label.config(text="Rotazione verticale destra oraria in corso...", foreground="orange")
+        self.cube_3d.rotate_face('right_vertical', 'clockwise', self.on_rotation_complete)
+    
+    def rotate_right_vertical_counter_clockwise(self):
+        """Ruota la fascia verticale destra in senso antiorario"""
+        if self.is_animating:
+            return
+        
+        self.set_animating(True)
+        self.status_label.config(text="Rotazione verticale destra antioraria in corso...", foreground="orange")
+        self.cube_3d.rotate_face('right_vertical', 'counter-clockwise', self.on_rotation_complete)
     
     def reset_cube(self):
         """Resetta il cubo allo stato iniziale"""
